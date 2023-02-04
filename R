@@ -1,0 +1,39 @@
+#Here is a code in R that generates the fractal image of the Julia set using the ggplot2 and gridExtra libraries:
+
+library(ggplot2)
+library(gridExtra)
+
+julia <- function(z, c, max_iter) {
+  for (i in 1:max_iter) {
+    if (abs(z) > 2) break
+    z <- z^2 + c
+  }
+  return(i)
+}
+
+julia_set <- function(xlim, ylim, n, c, max_iter) {
+  x <- seq(xlim[1], xlim[2], length.out = n)
+  y <- seq(ylim[1], ylim[2], length.out = n)
+  iterations <- outer(x, y, Vectorize(function(x, y) {
+    julia(complex(real = x, imaginary = y), c, max_iter)
+  }))
+  df <- data.frame(x = rep(x, each = n), y = rep(y, n), z = iterations)
+  ggplot(df, aes(x, y, fill = z)) +
+    geom_tile() +
+    scale_fill_gradient(low = "white", high = "black") +
+    coord_fixed(ratio = 1) +
+    theme_void() +
+    ggtitle(paste0("Julia Set (c = ", c, ")"))
+}
+
+grid.arrange(julia_set(c(-1.5, 1.5), c(-1.5, 1.5), 500, 0.285 + 0.01i, 100),
+             julia_set(c(-1.5, 1.5), c(-1.5, 1.5), 500, -0.8 + 0.156i, 100),
+             julia_set(c(-1.5, 1.5), c(-1.5, 1.5), 500, -0.70176 - 0.3842i, 100),
+             ncol = 3)
+
+
+#This code generates the Julia set by defining a function julia that takes in a complex number z, a constant c, and the maximum number of iterations. The function calculates the value of z after each iteration, and returns the number of iterations it takes for the magnitude of z to exceed 2 or for the maximum number of iterations to be reached.
+
+#The julia_set function takes in the limits of the x and y axes, the number of points in the grid, a constant c, and the maximum number of iterations. It creates a grid of complex numbers, and applies the julia function to each point in the grid. The results are then plotted using the ggplot2 library, with the color of each point determined based on the number of iterations it takes for the magnitude of the point to exceed 2.
+
+#The code then generates three images of the Julia set with different values of the constant c, and displays them in a grid using the gridExtra library. The resulting images are fractals, with self-similar patterns appearing at different scales. The black regions in the images represent points in the complex plane that converge after a certain number of iterations, while the colored regions represent points that diverge. The color of each point is determined based on the number of iterations it takes for the point to diverge.
